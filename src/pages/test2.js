@@ -128,6 +128,69 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <div className="lg:ml-64">
+        {userData ? (
+          <div>
+            {userData.mobileverification === 'false' ? (
+              <div className="flex justify-center items-center min-h-screen">
+                <div id="recaptcha-container"></div>
+                <div className="w-80 flex flex-col gap-2 rounded-lg p-2">
+                  {showOTP ? (
+                    <>
+                      <p class="mb-1 font-medium text-center text-black">Enter OTP</p>
+                            <div class="mb-1 flex flex-col">
+                              <div class="focus-within:border-red-600 relativeflex overflow-hidden rounded-md border-2 transition sm:w-80 lg:w-full">
+                                <input
+                                  type="text"
+                                  value={otp}
+                                  onChange={(e) => setOtp(e.target.value)}
+                                  placeholder="Enter OTP"
+                                  class="w-full border-gray-300 bg-white px-4 py-2 text-base text-black placeholder-gray-400 focus:outline-none"
+                                />
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={onOTPVerify}
+                              className="bg-red-600 w-full flex gap-1 items-center justify-center py-2.5 text-white rounded"
+                            >
+                              {loading && (
+                                <CgSpinner
+                                  size={20}
+                                  className="mt-1 animate-spin"
+                                />
+                              )}
+                              <span>Verify OTP</span>
+                            </button>
+                    </>
+                  ) : (
+                    <>
+                    <h1 className="text-xl text-center font-bold" >Verify Mobile Number</h1>
+                      <PhoneInput
+                        country={"in"}
+                        value={ph}
+                        onChange={setPh}
+                      />
+                      <button
+                        onClick={onSignup}
+                        className="bg-red-600 w-full flex gap-1 items-center justify-center py-2.5 text-white rounded"
+                      >
+                        {loading && (
+                          <CgSpinner
+                            size={20}
+                            className="mt-1 animate-spin"
+                          />
+                        )}
+                        <span>Send code via SMS</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+              <div class="font-[sans-serif] space-y-4 py-2">
+
+
       <div class="bg-yellow-50 text-yellow-800 pl-4 pr-10 py-4 rounded relative" role="alert">
         <div class="mb-3 flex items-center">
         
@@ -146,6 +209,28 @@ const Index = () => {
         <a href="/Dashboard/verification" class="border-b border-yellow-800 block w-max text-sm text-yellow-800 mt-3">Verify
           kyc</a>
       </div>
+
+
+    </div>
+    </div>
+            )}
+          </div>
+        ) : (
+          <div className="min-h-screen flex justify-center items-center">
+            <div aria-label="Loading..." role="status" className="flex items-center space-x-2">
+              <svg className="h-20 w-20 animate-spin stroke-gray-500" viewBox="0 0 256 256">
+                <line x1="128" y1="32" x2="128" y2="64" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="224" y1="128" x2="192" y2="128" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="128" y1="224" x2="128" y2="192" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="32" y1="128" x2="64" y2="128" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+                <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24"></line>
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

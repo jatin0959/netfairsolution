@@ -230,7 +230,7 @@ function Navbar() {
             </a>
           </li>
           <li>
-            <a href="javascript:void(0)"
+            <button  onClick={handleLogout}
               class="text-black hover:text-blue-600 text-sm flex items-center hover:bg-blue-50 rounded px-4 py-3 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-[18px] h-[18px] mr-4"
                 viewBox="0 0 6.35 6.35">
@@ -239,7 +239,7 @@ function Navbar() {
                   data-original="#000000" />
               </svg>
               <span>Logout</span>
-            </a>
+            </button>
           </li>
         </ul>
       </div>

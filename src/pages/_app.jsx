@@ -8,11 +8,11 @@ if (typeof window !== "undefined") {
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
-  const showNavbar = router.pathname == "/Dashboard";
+  const showNavbar = router.pathname.startsWith("/Dashboard");
 
   return (
     <>
-      {showNavbar && <Navbar />} {/* Render Navbar if route is not "/dashboard" */}
+      {showNavbar && <Navbar />} {/* Render Navbar if route starts with "/Dashboard" */}
       <Component {...pageProps} />
     </>
   );

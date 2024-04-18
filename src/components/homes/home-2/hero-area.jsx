@@ -4,8 +4,6 @@ import ArrowLine from '@/svg/arrow-line';
 import RoundLine from '@/svg/round-line';
 import useCharAnimation from '@/hooks/useCharAnimation';
 import Image from 'next/image';
-
-// img import 
 import scroll_bg from "../../../../public/assets/img/hero/scroll-down.png";
 import users_img from "../../../../public/assets/img/hero/hero-user.jpg";
 import hero_shape_1 from "../../../../public/assets/img/hero/hero-img-2-1.png";
@@ -71,7 +69,7 @@ const HeroArea = () => {
                   className="tp-btn-green wow tpfadeUp"
                   data-wow-duration=".9s"
                   data-wow-delay=".5s"
-                  href="/service-details"
+                  href="/register"
                 >
                   {btn_text}
                 </Link>
