@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { firebase } from '../../Firebase/config';
+import { firebase } from '../Firebase/config';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CgSpinner } from "react-icons/cg";
