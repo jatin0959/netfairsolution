@@ -7,7 +7,7 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { signInWithPhoneNumber } from "firebase/auth";
 
-const Index = () => {
+const MobileVerification = () => {
   const [ph, setPh] = useState("");
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
@@ -151,4 +151,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default MobileVerification;

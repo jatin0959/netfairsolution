@@ -2,7 +2,9 @@ import React, { useState,useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { firebase } from '../../Firebase/config';
+import { useRouter } from 'next/router';
 const Verification = () => {
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const [category, setCategory] = useState('');
     const [subCategory, setSubCategory] = useState('');
@@ -12,6 +14,7 @@ const Verification = () => {
     const [businessAge, setBusinessAge] = useState('');
     const [numEmployees, setNumEmployees] = useState('');
     const [hasWebsite, setHasWebsite] = useState('');
+    const [websiteUrl, setWebsiteUrl] = useState('');
     const [description, setDescription] = useState('');
     const [pan, setPan] = useState('');
     const [businessName, setBusinessName] = useState('');
@@ -77,7 +80,6 @@ const Verification = () => {
         setCategory(e.target.value);
         setSubCategory('');
     };
-
     const handleNextStep = () => {
         const requiredFields = {
             1: [category, subCategory, whatSell, collectDonations, annualTurnover, businessAge, numEmployees, hasWebsite, description],
@@ -85,15 +87,22 @@ const Verification = () => {
             3: [bankAccountNumber, confirmBankAccountNumber, bankIFSC],
             4: [selectedDocument] // Assuming at least one document is required
         };
-
+    
         const isAnyFieldEmpty = requiredFields[step].some(field => !field);
         if (isAnyFieldEmpty) {
             toast.error("Please fill in all required fields", { position: "top-right" });
             return;
         }
+    
+        // Check if bank account numbers match
+        if (bankAccountNumber !== confirmBankAccountNumber) {
+            toast.error("Bank account numbers do not match", { position: "top-right" });
+            return;
+        }
         
         setStep(step + 1);
     };
+    
 
     const handlePreviousStep = () => {
         setStep(step - 1);
@@ -181,6 +190,7 @@ const Verification = () => {
                 businessAge,
                 numEmployees,
                 hasWebsite,
+                websiteUrl,
                 description,
                 pan,
                 businessName,
@@ -197,12 +207,17 @@ const Verification = () => {
                 businessAddressProofURL: businessAddressProofURL,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
+            const userRef = firebase.firestore().collection("users").doc(user);
+            await userRef.update({
+              kycverification: "true"
+            });
 
             // Notify success
             toast.success("KYC details submitted successfully", { position: "top-right" });
+            router.push('/Dashboard');
         } catch (error) {
             console.error("Error submitting KYC:", error);
-            toast.error("Error submitting KYC details", { position: "top-right" });
+            
         }
         setLoading(false);
     };
@@ -357,28 +372,43 @@ const Verification = () => {
                                 </label>
 
                                 <label className="block" htmlFor="hasWebsite">
-                                    <p className="text-gray-600">Do you have a Website?</p>
-                                    <div className="flex items-center space-x-4">
-                                        <input
-                                            type="radio"
-                                            id="Yes"
-                                            name="hasWebsite"
-                                            value="Yes"
-                                            checked={hasWebsite === 'Yes'}
-                                            onChange={() => setHasWebsite('Yes')}
-                                        />
-                                        <label htmlFor="Yes">Yes</label>
-                                        <input
-                                            type="radio"
-                                            id="No"
-                                            name="hasWebsite"
-                                            value="No"
-                                            checked={hasWebsite === 'No'}
-                                            onChange={() => setHasWebsite('No')}
-                                        />
-                                        <label htmlFor="No">No</label>
-                                    </div>
-                                </label>
+    <p className="text-gray-600">Do you have a Website?</p>
+    <div className="flex items-center space-x-4">
+        <input
+            type="radio"
+            id="Yes"
+            name="hasWebsite"
+            value="Yes"
+            checked={hasWebsite === 'Yes'}
+            onChange={() => setHasWebsite('Yes')}
+        />
+        <label htmlFor="Yes">Yes</label>
+        <input
+            type="radio"
+            id="No"
+            name="hasWebsite"
+            value="No"
+            checked={hasWebsite === 'No'}
+            onChange={() => setHasWebsite('No')}
+        />
+        <label htmlFor="No">No</label>
+    </div>
+</label>
+
+{hasWebsite === 'Yes' && (
+    <label className="block" htmlFor="websiteUrl">
+        <p className="text-gray-600">Enter your website URL:</p>
+        <input
+            type="text"
+            id="websiteUrl"
+            className="w-full rounded-md border bg-white px-2 py-2 outline-none ring-blue-600 focus:ring-1"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://example.com"
+        />
+    </label>
+)}
+
 
                                 <label className="block" htmlFor="description">
                                     <p className="text-gray-600">Description</p>

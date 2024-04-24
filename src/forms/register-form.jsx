@@ -9,7 +9,10 @@ import { firebase } from "../Firebase/config"; // Import Firebase configuration
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/router";
-
+import { CgSpinner } from "react-icons/cg";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import { signInWithPhoneNumber } from "firebase/auth";
 const RegisterForm = () => {
   const [passwordType, setPasswordType] = useState("password");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +27,7 @@ const RegisterForm = () => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true); // Set submitting state to true
-      const { email, password, fullname, mobile, website } = data;
+      const { email, password, fullname, ph, website } = data;
       // Create user with email and password
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       const { user } = userCredential;
@@ -33,9 +36,10 @@ const RegisterForm = () => {
       await firebase.firestore().collection("users").doc(user.uid).set({
         fullname,
         email,
-        mobile,
+        ph,
         website,
-        mobilenumverification:"false"
+        mobilenumverification:false,
+        kycverification:"false"
       });
 
       setIsSubmitting(false); // Set submitting state to false after successful submission
@@ -59,7 +63,8 @@ const RegisterForm = () => {
       await firebase.firestore().collection("users").doc(user.uid).set({
         fullname: user.displayName,
         email: user.email,
-        mobilenumverification:"false"
+        mobilenumverification:"false",
+        kycverification:"false"
         // You can add more fields here if needed
       });
 
@@ -70,6 +75,90 @@ const RegisterForm = () => {
       toast.error(`Error: ${error.message}`); // Show error notification
     }
   };
+
+
+  const [ph, setPh] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState(""); // Array to hold OTP digits
+  
+
+  
+
+  function onSignup() {
+    setLoading(true);
+
+    const appVerifier = new firebase.auth.RecaptchaVerifier(
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: (response) => {
+          signIn();
+        },
+        "expired-callback": () => {},
+      }
+    );
+
+    const formatPh = "+" + ph;
+
+    signInWithPhoneNumber(firebase.auth(), formatPh, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        setLoading(false);
+        setShowOTP(true);
+        toast.success("OTP sent successfully!");
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  }
+
+  function signIn() {
+    const appVerifier = new firebase.auth.RecaptchaVerifier(
+      "recaptcha-container"
+    );
+    const formatPh = "+" + ph;
+
+    signInWithPhoneNumber(firebase.auth(), formatPh, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        setLoading(false);
+        setShowOTP(true);
+        toast.success("OTP sent successfully!");
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  }
+
+  function onOTPVerify() {
+    setLoading(true);
+    window.confirmationResult
+      .confirm(otp) // Use the OTP directly since it's already a string
+      .then(async (res) => {
+        setLoading(false);
+        toast.success("Phone number verified successfully!");
+        console.log("User object:", res.user);
+  
+        // Update mobileverification status to true
+        const userRef = firebase.firestore().collection("users").doc(user);
+        await userRef.update({
+          mobileverification: true
+        });
+  
+       
+  
+        // Reload the page
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error("Error verifying OTP:", err);
+        setLoading(false);
+      });
+  }
+  
 
   return (
     <>
@@ -94,15 +183,7 @@ const RegisterForm = () => {
               <span className="floating-label">Your Email</span>
             </div>
           </div>
-          <div className="col-12">
-            <div className="postbox__comment-input mb-30">
-              <input
-                {...register("mobile")}
-                className="inputText"
-              />
-              <span className="floating-label">Your Mobile Number</span>
-            </div>
-          </div>
+       
           <div className="col-12">
             <div className="postbox__comment-input mb-30">
               <input
